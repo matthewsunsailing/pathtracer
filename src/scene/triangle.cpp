@@ -28,8 +28,23 @@ bool Triangle::has_intersection(const Ray &r) const {
   // function records the "intersection" while this function only tests whether
   // there is a intersection.
 
+  // Moller-Trumbore Algorithm
+  Vector3D e1 = p2 - p1;
+  Vector3D e2 = p3 - p1;
+  Vector3D s = r.o - p1;
+  Vector3D s1 = cross(r.d, e2);
+  Vector3D s2 = cross(s, e1);
+  Vector3D test_vec = (1 / dot(s1, e1)) * Vector3D(dot(s2, e2), dot(s1, s), dot(s2, r.d));
 
-  return true;
+  double t = test_vec.x;
+
+  // barycentric coordinates for intersection point
+  double b1 = test_vec.y;
+  double b2 = test_vec.z;
+  double b3 = 1 - b1 - b2;
+
+  return (t > r.min_t) && (t < r.max_t) && (b1 >= 0) && (b2 >= 0)
+			 && (b3 >= 0) && (b1 <= 1) && (b2 <= 1) && (b3 <= 1);
 
 }
 
@@ -38,9 +53,32 @@ bool Triangle::intersect(const Ray &r, Intersection *isect) const {
   // implement ray-triangle intersection. When an intersection takes
   // place, the Intersection data should be updated accordingly
 
+  bool isIsect = has_intersection(r);
 
-  return true;
+  if (isIsect) {
+	// Moller-Trumbore Algorithm
+	Vector3D e1 = p2 - p1;
+	Vector3D e2 = p3 - p1;
+	Vector3D s = r.o - p1;
+	Vector3D s1 = cross(r.d, e2);
+	Vector3D s2 = cross(s, e1);
+	Vector3D test_vec = (1 / dot(s1, e1)) * Vector3D(dot(s2, e2), dot(s1, s), dot(s2, r.d));
 
+	double t = test_vec.x;
+
+	// barycentric coordinates for intersection point
+	double b2 = test_vec.y;
+	double b3 = test_vec.z;
+	double b1 = 1 - b2 - b3;
+
+	r.max_t = t;
+	isect->t = t;
+	isect->n = b1 * n1 + b2 * n2 + b3 * n3;
+	isect->primitive = this;
+	isect->bsdf = get_bsdf();
+  }
+
+  return isIsect;
 
 }
 

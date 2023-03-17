@@ -44,43 +44,9 @@
 <h2 align="middle">YOUR NAME(S)</h2>
 
 <!-- Add Website URL -->
-<h2 align="middle">Website URL: <a href="TODO">TODO</a></h2>
+<h2 align="middle">Website URL: <a href="https://matthewsunsailing.github.io/proj-webpage/proj3-1/index.html">Click Here.</a></h2>
 
 <br><br>
-
-
-<div align="center">
-  <table style="width=100%">
-      <tr>
-          <td align="middle">
-          <img src="images/example_image.png" width="480px" />
-          <figcaption align="middle">Results Caption: my bunny is the bounciest bunny</figcaption>
-      </tr>
-  </table>
-</div>
-
-<p>All of the text in your write-up should be <em>in your own words</em>. If you need to add additional HTML features to this document, you can search the <a href="http://www.w3schools.com/">http://www.w3schools.com/</a> website for instructions. To edit the HTML, you can just copy and paste existing chunks and fill in the text and image file names appropriately.</p>
-<o>The website writeup is intended to be a self-contained walkthrough of the assignment: we want this to be a piece of work which showcases your understanding of relevant concepts through both mesh images as well as written explanations about what you did to complete each part of the assignment. Try to be as clear and organized as possible when writing about your own output files or extensions to the assignment. We want to understand what you've achieved and how you've done it!</p> 
-<p>If you are well-versed in web development, feel free to ditch this template and make a better looking page.</p>
-
-
-<p>Here are a few problems students have encountered in the past. Test your website on the instructional machines early!</p>
-<ul>
-<li>Your main report page should be called index.html.</li>
-<li>Be sure to include and turn in all of the other files (such as images) that are linked in your report!</li>
-<li>Use only <em>relative</em> paths to files, such as <pre>"./images/image.jpg"</pre>
-Do <em>NOT</em> use absolute paths, such as <pre>"/Users/student/Desktop/image.jpg"</pre></li>
-<li>Pay close attention to your filename extensions. Remember that on UNIX systems (such as the instructional machines), capitalization matters. <pre>.png != .jpeg != .jpg != .JPG</pre></li>
-<li>Be sure to adjust the permissions on your files so that they are world readable. For more information on this please see this tutorial: <a href="http://www.grymoire.com/Unix/Permissions.html">http://www.grymoire.com/Unix/Permissions.html</a></li>
-<li>And again, test your website on the instructional machines early!</li>
-</ul>
-
-
-<p>Here is an example of how to include a simple formula:</p>
-<p align="middle"><pre align="middle">a^2 + b^2 = c^2</pre></p>
-<p>or, alternatively, you can include an SVG image of a LaTex formula.</p>
-
-<div>
 
 <h2 align="middle">Overview</h2>
 <p>
@@ -97,7 +63,13 @@ Show images with normal shading for a few small .dae files. -->
   Walk through the ray generation and primitive intersection parts of the rendering pipeline.
 </h3>
 <p>
-    YOUR RESPONSE GOES HERE
+    To generate a ray, a camera coordinate and normalized direction vector are necessary. Three mappings are required for the sampling of every pixel via raycasting, and they are as follows:
+    <ol>
+        <li>Pixel coordinate frame to normalized coordinate frame via axis scaling.</li>
+        <li>Normalized coordinate frane to image frame via scaling and translation perpendicular to camera z-axis.</li>
+        <li>Camera-to-world transformation on direction vector using the c2w constant. (The origin of the ray is also translated to match the camera origin.)</li>
+    </ol>
+    The goal of the first two transformations is to map the pixel plane onto the image plane to draw a ray from the camera origin through the field of view for each pixel. Multiple sampling for a single pixel can be done by random sampling. Once the ray direction is determined, the third transformation allows for the proper ray propagation.
 </p>
 <br>
 
@@ -105,7 +77,10 @@ Show images with normal shading for a few small .dae files. -->
   Explain the triangle intersection algorithm you implemented in your own words.
 </h3>
 <p>
-    YOUR RESPONSE GOES HERE
+    Ray-triangle intersection was implemented using the Moller-Trumbore algorithm. Basically, this algorithm effectively combines barycentric coordinates and the implicit definition of a plane to determine the intersection point's residence in the triangle by making sure that the coordinates are within [0, 1] and verifying that the intersection t-value is within the bounds of the scene.
+</p>
+<p>
+    The sphere check was implemented according to the slide provided in the spec. Using the quadratic formula to solve an equation give the intersection t-values. Ensuring the discriminant was positive allowed for filtering imaginary results. Checking if either of the roots fell within the bounds and selecting the minimum root results in the intersection point.
 </p>
 <br>
 
@@ -117,22 +92,22 @@ Show images with normal shading for a few small .dae files. -->
   <table style="width:100%">
     <tr align="center">
       <td>
-        <img src="images/your_file.png" align="middle" width="400px"/>
-        <figcaption>example1.dae</figcaption>
+        <img src="images/banana.png" align="middle" width="400px"/>
+        <figcaption>banana.dae</figcaption>
       </td>
       <td>
-        <img src="images/your_file.png" align="middle" width="400px"/>
-        <figcaption>example2.dae</figcaption>
+        <img src="images/CBspheres.png" align="middle" width="400px"/>
+        <figcaption>CBspheres.dae</figcaption>
       </td>
     </tr>
     <tr align="center">
       <td>
-        <img src="images/your_file.png" align="middle" width="400px"/>
-        <figcaption>example3.dae</figcaption>
+        <img src="images/cow.png" align="middle" width="400px"/>
+        <figcaption>cow.dae</figcaption>
       </td>
       <td>
-        <img src="images/your_file.png" align="middle" width="400px"/>
-        <figcaption>example4.dae</figcaption>
+        <img src="images/building.png" align="middle" width="400px"/>
+        <figcaption>building.dae</figcaption>
       </td>
     </tr>
   </table>
@@ -149,7 +124,7 @@ Compare rendering times on a few scenes with moderately complex geometries with 
   Walk through your BVH construction algorithm. Explain the heuristic you chose for picking the splitting point.
 </h3>
 <p>
-    YOUR RESPONSE GOES HERE
+    I did a bit of research on surface area heuristic for axis splitting and chose to implement this. The general implementation is as follows:<br><br>For any node, compute the mean 3D position of the centroids of each primitive within the node's bounding box. This results in three possible points along which to split the selected axis. Then, compute the cost of splitting each axis using a simple cost function of surface area of bounding box multiplied by the primitive count in each child node. Next, select the lowest cost axis and split at the previously found candidate point. This method of axis splitting reduces the chances that a ray will hit a bounding box without hitting a primitive.<br><br>The reason for my selecting this heuristic over others (specifically, selecting the mean over the median centroid) is effectively as such:<br><br>Firstly, this method doesn't require prior information about the distribution of the primitives. This method assumes a relatively even distribution of primitives over the scene. Under this assumption, the mean centroid and the median centroid are roughly equivalent, and thus over many renders the tree will remain mostly balanced.<br>Second, using the median over the mean would require sorting the primitives along each axis, which is cost-heavy, as a sort is required at each step in the recursion. For such a cost increase, the trade-off is a marginally more optimal tree.
 </p>
 
 <h3>
@@ -160,22 +135,22 @@ Compare rendering times on a few scenes with moderately complex geometries with 
   <table style="width:100%">
     <tr align="center">
       <td>
-        <img src="images/your_file.png" align="middle" width="400px"/>
-        <figcaption>example1.dae</figcaption>
+        <img src="images/bunny.png" align="middle" width="400px"/>
+        <figcaption>bunny.dae</figcaption>
       </td>
       <td>
-        <img src="images/your_file.png" align="middle" width="400px"/>
-        <figcaption>example2.dae</figcaption>
+        <img src="images/maxplanck.png" align="middle" width="400px"/>
+        <figcaption>maxplanck.dae</figcaption>
       </td>
     </tr>
     <tr align="center">
       <td>
-        <img src="images/your_file.png" align="middle" width="400px"/>
-        <figcaption>example3.dae</figcaption>
+        <img src="images/dragon.png" align="middle" width="400px"/>
+        <figcaption>dragon.dae</figcaption>
       </td>
       <td>
-        <img src="images/your_file.png" align="middle" width="400px"/>
-        <figcaption>example4.dae</figcaption>
+        <img src="images/CBlucy.png" align="middle" width="400px"/>
+        <figcaption>CBlucy.dae</figcaption>
       </td>
     </tr>
   </table>
@@ -186,7 +161,7 @@ Compare rendering times on a few scenes with moderately complex geometries with 
   Compare rendering times on a few scenes with moderately complex geometries with and without BVH acceleration. Present your results in a one-paragraph analysis.
 </h3>
 <p>
-    YOUR RESPONSE GOES HERE
+    The improvements the BVH tree brings are immense. The meshedit/cow.dae image rendered in 0.2158 seconds using the BVH system, a 230x improvement over the 49.7292 seconds that the non-BVH systems. The sky/dragon.dae image rendered in 0.1683 seconds using the BVH system, a 7191x improvement over the 1210.2393 seconds (over 20 minutes) that the non-BVH system took. It seems that for images with more polygons, the improvement was multitudes more tangible. This is because the computational complexity of the non-BVH system is $O(n)$, while the computational complexity of the BVH system is $O(\log{n})$.<br><br>As an aside, the CBlucy.dae image actually rendered (in 0.1288 seconds) using BVH, but it took well over an hour to produce nothing without using BVH. Not sure whether this is a standalone case or something replicable, but it is worth noting.
 </p>
 <br>
 
@@ -200,7 +175,7 @@ Compare the results between uniform hemisphere sampling and lighting sampling in
   Walk through both implementations of the direct lighting function.
 </h3>
 <p>
-    YOUR RESPONSE GOES HERE
+    Direct lighting considers only zero- and one-bounce light rays (rays that do not bounce or bounce only once in the object space before arriving at the image plane). Uniform hemisphere sampling and importance sampling are the two methods implemented, differing primarily in the way that they sample the ray directions for estimating the illumination with a Monte Carlo estimator. For both, the inverse light path of a ray starting at the camera and going into the scene are considered; upon intersecting an object, the radiance that the camera would observe at this intersection point depends on the BRDF of the surface material and the irradiance at that point.<br><br>In this Monte Carlo estimation, several ray directions are sampled in the object space, and new rays are propagated in these directions until they reach a light source. If they are obstructed, they are treated as shadow rays and thus do not contribute to the summation.<br><br>In the case of uniform hemisphere sampling, the direction of the rays is not guaranteed to point towards the light source, which results in many of the rays having the chance of non-contribution to the summation. On the other hand, importance sampling are guaranteed to point in the direction of the light source and are only discounted if there is an obstruction to that ray, and thus the irradiance is better characterized compared to hemisphere sampling.
 </p>
 
 <h3>
